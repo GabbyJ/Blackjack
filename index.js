@@ -18,8 +18,10 @@ let blackjackGame = {
     "wins": 0,
     "losses": 0,
     "draws": 0,
-    "isStand": false,
+    "dealerTurn": false,
     "turnsOver": false,
+    
+
 };
 
 const YOU = blackjackGame["you"];
@@ -38,7 +40,8 @@ document.querySelector("#blackjack-deal-button").addEventListener("click", black
 
   //display random cards on you and dealer sides
 function blackjackHit() {
-    if (blackjackGame["isStand"] === false) {
+    if (blackjackGame["dealerTurn"] === false) {
+        document.querySelector("#blackjack-stand-button").addEventListener("click", dealerLogic);
         let card = randomCard();
         showCard(card, YOU);
         updateScore(card, YOU);
@@ -64,7 +67,7 @@ function showCard(card, activePlayer) {
   //remove cards on deal
 function blackjackDeal() {
     if (blackjackGame["turnsOver"] === true) {
-        blackjackGame["isStand"] = false;
+        blackjackGame["dealerTurn"] = false;
         //showResult(computeWinner());
         let yourImages = document.querySelector("#your-box").querySelectorAll("img");
         let dealerImages = document.querySelector("#dealer-box").querySelectorAll("img");
@@ -138,19 +141,28 @@ function  sleep(ms) {
   
   //dealer hits
 async function dealerLogic() {
-    blackjackGame["isStand"] = true;
+    if (YOU['score'] > 0) {
+        blackjackGame["dealerTurn"] = true;
+        document.querySelector("#blackjack-stand-button").removeEventListener("click", dealerLogic);
+        
+        while (DEALER['score'] < 18 && blackjackGame["dealerTurn"] === true){
+            let card = randomCard();
+            showCard(card, DEALER);
+            updateScore(card, DEALER);
+            showScore(DEALER);
+            if (DEALER['score'] < 18 && YOU['score'] > 21){
+                break;
+            } else if (DEALER['score'] > YOU['score']){
+                break;
+            } else {
+                await sleep(1000);
+            }   
+        }
 
-    while (DEALER['score'] < 18 && blackjackGame["isStand"] === true){
-        let card = randomCard();
-        showCard(card, DEALER);
-        updateScore(card, DEALER);
-        showScore(DEALER);
-        await sleep(1000);
+        blackjackGame["turnsOver"] = true;
+        let winner = computeWinner();
+        showResult(winner);
     }
-    
-    blackjackGame["turnsOver"] = true;
-    let winner = computeWinner();
-    showResult(winner);
     
 }
   //end dealer hits
