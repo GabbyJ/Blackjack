@@ -1,6 +1,7 @@
 body{
-    background: url("images/card-board.jpg"), #000000;
-    background-size: cover;
+    /*background: url("images/card-board.jpg"), #000000;
+    background-size: cover;*/
+    background-color: darkgray;
     
 }
 .container {
